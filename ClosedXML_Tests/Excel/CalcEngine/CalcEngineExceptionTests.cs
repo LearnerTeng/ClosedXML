@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using ClosedXML.Excel.CalcEngine;
 using ClosedXML.Excel.CalcEngine.Exceptions;
 using NUnit.Framework;
 using System;
@@ -34,23 +35,12 @@ namespace ClosedXML_Tests.Excel.CalcEngine
         public void InvalidFunction()
         {
             Exception ex;
-            ex = Assert.Throws<NameNotRecognizedException>(() => XLWorkbook.EvaluateExpr("XXX(A1:A2)"));
-            Assert.That(ex.Message, Is.EqualTo("The identifier `XXX` was not recognised."));
+            ex = Assert.Throws<ExpressionParseException>(() => XLWorkbook.EvaluateExpr("XXX(A1:A2)"));
+            Assert.That(ex.Message, Is.EqualTo("Unknown function: XXX"));
 
             var ws = new XLWorkbook().AddWorksheet();
-            ex = Assert.Throws<NameNotRecognizedException>(() => ws.Evaluate("XXX(A1:A2)"));
-            Assert.That(ex.Message, Is.EqualTo("The identifier `XXX` was not recognised."));
-        }
-
-        [Test]
-        public void NestedNameNotRecognizedException()
-        {
-            using var wb = new XLWorkbook();
-            var ws = wb.AddWorksheet();
-            ws.Cell("A1").SetFormulaA1("=XXX");
-            ws.Cell("A2").SetFormulaA1(@"=IFERROR(A1, ""Success"")");
-
-            Assert.AreEqual("Success", ws.Cell("A2").Value);
+            ex = Assert.Throws<ExpressionParseException>(() => ws.Evaluate("XXX(A1:A2)"));
+            Assert.That(ex.Message, Is.EqualTo("Unknown function: XXX"));
         }
     }
 }

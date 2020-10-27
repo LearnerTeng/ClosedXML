@@ -1,4 +1,3 @@
-using ClosedXML.Excel.CalcEngine.Exceptions;
 using ClosedXML.Excel.CalcEngine.Functions;
 using System;
 using System.Collections.Generic;
@@ -475,10 +474,13 @@ namespace ClosedXML.Excel.CalcEngine
 
                     // look for external objects
                     var xObj = GetExternalObject(id);
-                    if (xObj == null)
-                        throw new NameNotRecognizedException($"The identifier `{id}` was not recognised.");
+                    if (xObj != null)
+                    {
+                        x = new XObjectExpression(xObj);
+                        break;
+                    }
 
-                    x = new XObjectExpression(xObj);
+                    Throw($"Unexpected identifier: {id}");
                     break;
 
                 // sub-expressions
